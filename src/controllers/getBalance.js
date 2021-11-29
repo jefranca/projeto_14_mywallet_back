@@ -1,16 +1,10 @@
-import connection from "../database.js";
+import connection from "../database/database.js";
 
 export default async function getBalance(req, res){
-    const authorization = req.headers['authorization'];
-    const token = authorization?.replace('Bearer ', '');
-
-    if(!token) return res.sendStatus(401);
+    const {user} = req.locals;
 
     try{
-        const response = await connection.query(`
-            SELECT "userId" FROM sessions WHERE token = $1
-        `, [token]);
-        const userId = response.rows[0]?.userId;
+        const userId = user.rows[0]?.userId;
 
         if(userId) {
             const result = await connection.query(`SELECT * FROM balance WHERE "userId"=$1;`, [userId])
